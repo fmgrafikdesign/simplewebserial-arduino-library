@@ -36,7 +36,7 @@ private:
     char eventNames[MaximumNumberOfEvents][MaximumEventNameLength]; // Array of event names
     void (*callbacks[])(); // Array of function pointers
 
-    char eventName[MaximumEventNameLength];
+    // char eventName[MaximumEventNameLength];
 
 
 };

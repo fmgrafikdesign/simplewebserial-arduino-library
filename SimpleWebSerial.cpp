@@ -53,27 +53,30 @@ void SimpleWebSerial::check() {
                 Serial.print(" to ");
                 Serial.println(eventNames[i]);
 
-                strncpy(eventName, testArray[0], MaximumEventNameLength);
+                // strncpy(eventName, testArray[0], MaximumEventNameLength);
 
-                int compare_result = strcmp(eventNames[i], eventName);
-                Serial.print("first character in eventNames:");
-                Serial.println(eventNames[_index][0]);
+                int compare_result = strcmp(eventNames[i], testArray[0]);
+                //Serial.print("first character in eventNames:");
+                //Serial.println(eventNames[_index][0]);
 
-                Serial.print("first character in received event:");
-                Serial.println(eventName[0]);
+                //Serial.print("first character in received event:");
+                //Serial.println(eventName[0]);
 
-                Serial.println(compare_result);
+                // Serial.println(compare_result);
                 if (compare_result == 0) {
                     Serial.print("Found event named ");
-                    Serial.print(eventName);
+                    Serial.print(testArray[0]);
                     Serial.println(" in registered eventNames");
+
+                    (*callbacks[i])();
+
                     namedEvent = true;
                     break;
                 }
             }
             if (!namedEvent) {
                 Serial.print("Could not find an event named '");
-                Serial.print(eventName);
+                Serial.print(testArray[0]);
                 Serial.println("' in the registered eventNames");
             }
 
@@ -82,7 +85,7 @@ void SimpleWebSerial::check() {
                     "Received array has more than 1 element but its first element is not a string. Malformed data?");
         } else {
             Serial.println("Received array has only 1 element. Handle pure data");
-            // Handle pure data
+            // TODO Handle pure data
         }
 
         // If it's a named event, find out its name
@@ -108,7 +111,7 @@ void SimpleWebSerial::on(const char *name, void (*callback)()) {
     if (compare_result == 0) {
         Serial.println("Event name equals values!");
     }
-    callbacks[_index]();
+    // callbacks[_index]();
     _index++;
 }
 
