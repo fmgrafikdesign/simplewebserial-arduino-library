@@ -38,9 +38,9 @@ void SimpleWebSerial::check() {
         }
         // When we receive the endMarker, terminate the string and set parseData to true
         else {
-            bufferIndex = 0;
             receivedChars[bufferIndex] = '\0'; // terminate the string
             parseData = true;
+            bufferIndex = 0;
         }
     }
 
@@ -76,7 +76,8 @@ void SimpleWebSerial::check() {
                 Serial.print(" to ");
                 Serial.println(eventNames[i]);
 
-                int compare_result = strcmp(eventNames[i], parsed[0]);
+                int compare_result = strcmp(eventNames[i], (const char *)parsed[0]);
+                Serial.println(compare_result);
                 //Serial.print("first character in eventNames:");
                 //Serial.println(eventNames[_index][0]);
 
@@ -89,10 +90,10 @@ void SimpleWebSerial::check() {
                     Serial.print(parsed[0]);
                     Serial.println(" in registered eventNames");
 
-                    (*callbacks[i])(parsed[1]);
+                    //(*callbacks[i])(parsed[1]);
 
                     namedEvent = true;
-                    break;
+                    // break;
                 }
             }
             if (!namedEvent) {
@@ -115,95 +116,18 @@ void SimpleWebSerial::check() {
 
     }
 
-/*
-    while (Serial.available() > 0) {
-
-        //DEBUG: Create a fake json we want to receive
-        JSONVar testObject;
-        JSONVar testArray;
-
-        testObject["key1"] = true;
-        testObject["anotherkey"] = 12455;
-
-        testArray[0] = "values";
-        testArray[1] = testObject;
-
-        //Serial.println(JSON.stringify(testArray));
-        //Serial.println(JSON.typeof(testArray[1]));
-
-
-        // Find out if it's an named event
-        bool namedEvent = false;
-        if (testArray.length() > 1 && JSON.typeof(testArray[0]) == "string") {
-            Serial.println(
-                    "Received array has more than 1 element and its first element is string. Assuming named event!");
-            for (int i = 0; i < ARRAYSIZE(eventNames); i++) {
-                if (eventNames[i][0] == '\0') continue;
-
-                Serial.print("Comparing ");
-                Serial.print((const char *) testArray[0]);
-                Serial.print(" to ");
-                Serial.println(eventNames[i]);
-
-                // strncpy(eventName, testArray[0], MaximumEventNameLength);
-
-                int compare_result = strcmp(eventNames[i], testArray[0]);
-                //Serial.print("first character in eventNames:");
-                //Serial.println(eventNames[_index][0]);
-
-                //Serial.print("first character in received event:");
-                //Serial.println(eventName[0]);
-
-                // Serial.println(compare_result);
-                if (compare_result == 0) {
-                    Serial.print("Found event named ");
-                    Serial.print(testArray[0]);
-                    Serial.println(" in registered eventNames");
-
-                    (*callbacks[i])(testArray[1]);
-
-                    namedEvent = true;
-                    break;
-                }
-            }
-            if (!namedEvent) {
-                Serial.print("Could not find an event named '");
-                Serial.print(testArray[0]);
-                Serial.println("' in the registered eventNames");
-            }
-
-        } else if (testArray.length() > 1 && JSON.typeof(testArray[0]) != "string"){
-            Serial.println(
-                    "Received array has more than 1 element but its first element is not a string. Malformed data?");
-        } else {
-            Serial.println("Received array has only 1 element. Handle pure data");
-            // TODO Handle pure data
-        }
-
-        // If it's a named event, find out its name
-
-        // Loop through registered eventNames
-
-        //this->onData();
-    }
- */
 }
 
 void SimpleWebSerial::on(const char *name, void (*callback)(JSONVar)) {
     // TODO show warning if you're using more events than allowed. Check if you can do that w/ Arduino compiler
 
-    Serial.print(name);
-    Serial.print(" has been defined as an event with index ");
-    Serial.println(_index);
-
     strcpy(eventNames[_index], name);
     callbacks[_index] = callback;
 
-    int compare_result = strcmp(eventNames[_index], "values");
-    Serial.println(eventNames[_index]);
-    if (compare_result == 0) {
-        Serial.println("Event name equals values!");
-    }
+    Serial.print(eventNames[_index]);
+    Serial.print(" has been defined as an event with index ");
+    Serial.println(_index);
+
     // callbacks[_index]();
     _index++;
 }
