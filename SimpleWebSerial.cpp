@@ -54,8 +54,8 @@ void SimpleWebSerial::check() {
         parseData = false;
             // It is to be assumed that receivedChars will be stringified JSON once it's complete.
             parseData = false;
-            Serial.print("This just in ... ");
-            Serial.println(receivedChars);
+            //Serial.print("This just in ... ");
+            //Serial.println(receivedChars);
             JSONVar parsed = JSON.parse(receivedChars);
 
             // JSON.typeof(jsonVar) can be used to get the type of the var
@@ -71,8 +71,7 @@ void SimpleWebSerial::check() {
             // Find out if it's an named event
             bool namedEvent = false;
             if (parsed.length() > 1 && JSON.typeof(parsed[0]) == "string") {
-                Serial.println(
-                        "Received array has more than 1 element and its first element is string. Assuming named event!");
+                // Serial.println("Received array has more than 1 element and its first element is string. Assuming named event!");
                 for (int i = 0; i < ARRAYSIZE(eventNames); i++) {
                     if (eventNames[i][0] == '\0') continue;
 
@@ -91,11 +90,13 @@ void SimpleWebSerial::check() {
 
                     // Serial.println(compare_result);
                     if (compare_result == 0) {
+                        /*
                         Serial.print("Found event named ");
                         Serial.print(parsed[0]);
                         Serial.println(" in registered eventNames");
                         Serial.print("Trying to call callback with index ");
                         Serial.println(i);
+                         */
                         //Serial.println((*callbacks[i]));
 
                         // (*callbacks[i])((JSONVar) parsed[1]);
@@ -104,7 +105,7 @@ void SimpleWebSerial::check() {
                         (*callbacks[i])();
 
                         namedEvent = true;
-                        // break;
+                        break;
                     }
                 }
                 if (!namedEvent) {
