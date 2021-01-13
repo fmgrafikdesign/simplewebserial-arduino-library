@@ -42,6 +42,7 @@ private:
     char eventNames[MaximumNumberOfEvents][MaximumEventNameLength]; // Array of event names
     void (*callbacks[])(JSONVar); // Array of function pointers
     char receivedChars[SerialBufferSize];
+    bool parseData = false;
     // char eventName[MaximumEventNameLength];
 
 
