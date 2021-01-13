@@ -40,7 +40,7 @@ private:
     int _index = 0; // Keeps track on used events
 
     char eventNames[MaximumNumberOfEvents][MaximumEventNameLength]; // Array of event names
-    void (*callbacks[])(); // Array of function pointers
+    void (*callbacks[MaximumNumberOfEvents])(); // Array of function pointers
     char receivedChars[SerialBufferSize];
     bool parseData = false;
     // char eventName[MaximumEventNameLength];

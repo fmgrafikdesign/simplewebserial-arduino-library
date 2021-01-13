@@ -28,8 +28,11 @@ void SimpleWebSerial::check() {
 
     // Read data until endMarker is received or buffer is full
     while (Serial.available() > 0 && parseData == false) {
-        // (*callbacks[0])();
+        // This works
         // (*_callback)();
+
+        // This breaks the program, even though it's the same function
+        // (*callbacks[0])();
         receivedChar = Serial.read();
 
         if (receivedChar != endMarker) {
@@ -49,7 +52,6 @@ void SimpleWebSerial::check() {
 
     if (parseData) {
         parseData = false;
-        /*
             // It is to be assumed that receivedChars will be stringified JSON once it's complete.
             parseData = false;
             Serial.print("This just in ... ");
@@ -99,7 +101,7 @@ void SimpleWebSerial::check() {
                         // (*callbacks[i])((JSONVar) parsed[1]);
                         // (*_callback)();
 
-                        //(*callbacks[i])();
+                        (*callbacks[i])();
 
                         namedEvent = true;
                         // break;
@@ -122,7 +124,7 @@ void SimpleWebSerial::check() {
             // If it's a named event, find out its name
 
             // Loop through registered eventNames
-    */
+
     }
 
 }
