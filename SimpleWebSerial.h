@@ -17,8 +17,10 @@
 #define MaximumEventNameLength 16
 #endif
 
-#ifndef SerialBufferSize
-#define SerialBufferSize 64
+// This is fairly limiting in terms of amount or complexity of objects you can parse.
+// Increase it as you can afford with your memory.
+#ifndef BufferSize
+#define BufferSize 256
 #endif
 
 #include "Arduino.h"
@@ -29,19 +31,20 @@ public:
     SimpleWebSerial();
     void check(); // Makes the library check for serial data
     //void on(const char* name, void (*callback)()); // Event name, callback
-    void on(const char* name, void (*callback)()); // Event name, callback
+    void on(const char* name, void (*callback)(JSONVar data)); // Event name, callback
     void onData(); // callback
     void send(JSONVar data); // Event name + data or just data
     void send(const char* name, JSONVar data); // Event name + data or just data
     void setCallback(void (*callback)()); // Set callback for debug purposes
     void listEvents(); // DEBUG: List all registered events
+    void warn(const char* message);
 private:
     void (*_callback)();
     int _index = 0; // Keeps track on used events
 
     char eventNames[MaximumNumberOfEvents][MaximumEventNameLength]; // Array of event names
-    void (*callbacks[MaximumNumberOfEvents])(); // Array of function pointers
-    char receivedChars[SerialBufferSize];
+    void (*callbacks[MaximumNumberOfEvents])(JSONVar data); // Array of function pointers
+    char receivedChars[BufferSize];
     bool parseData = false;
     // char eventName[MaximumEventNameLength];
 
