@@ -71,13 +71,13 @@ void SimpleWebSerial::check() {
             for (int i = 0; i < ARRAYSIZE(eventNames); i++) {
                 if (eventNames[i][0] == '\0') continue;
 
-                Serial.print("Comparing ");
-                Serial.print((const char *) parsed[0]);
-                Serial.print(" to ");
-                Serial.println(eventNames[i]);
+                //Serial.print("Comparing ");
+                //Serial.print((const char *) parsed[0]);
+                //Serial.print(" to ");
+                //Serial.println(eventNames[i]);
 
                 int compare_result = strcmp(eventNames[i], (const char *)parsed[0]);
-                Serial.println(compare_result);
+                //Serial.println(compare_result);
                 //Serial.print("first character in eventNames:");
                 //Serial.println(eventNames[_index][0]);
 
@@ -89,8 +89,9 @@ void SimpleWebSerial::check() {
                     Serial.print("Found event named ");
                     Serial.print(parsed[0]);
                     Serial.println(" in registered eventNames");
+                    Serial.println(parsed[1]);
 
-                    //(*callbacks[i])(parsed[1]);
+                    // (*callbacks[i])((JSONVar) parsed[1]);
 
                     namedEvent = true;
                     // break;
