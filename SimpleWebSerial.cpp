@@ -21,16 +21,20 @@ SimpleWebSerial::SimpleWebSerial() {
 }
 
 void SimpleWebSerial::check() {
+
     while (Serial.available() > 0) {
 
         // Read data until newline or break character or whatever
-        // char buffer[512] = Serial.readStringUntil('\n');
+        // TODO better serial reading
+        //char buffer[64] = {};
+        //buffer = Serial.readStringUntil('\n');
 
         //DEBUG: Create a fake json we want to receive
         JSONVar testObject;
         JSONVar testArray;
 
-        testObject = true;
+        testObject["key1"] = true;
+        testObject["anotherkey"] = 12455;
 
         testArray[0] = "values";
         testArray[1] = testObject;
@@ -68,7 +72,7 @@ void SimpleWebSerial::check() {
                     Serial.print(testArray[0]);
                     Serial.println(" in registered eventNames");
 
-                    (*callbacks[i])();
+                    (*callbacks[i])(testArray[1]);
 
                     namedEvent = true;
                     break;
@@ -96,7 +100,7 @@ void SimpleWebSerial::check() {
     }
 }
 
-void SimpleWebSerial::on(const char *name, void (*callback)()) {
+void SimpleWebSerial::on(const char *name, void (*callback)(JSONVar)) {
     // TODO show warning if you're using more events than allowed. Check if you can do that w/ Arduino compiler
 
     Serial.print(name);
@@ -126,8 +130,15 @@ void SimpleWebSerial::listEvents() {
     // Serial.println(eventName);
 }
 
-void SimpleWebSerial::send() {
+void SimpleWebSerial::send(JSONVar data) {
+    Serial.println(JSON.stringify(data));
+}
 
+void SimpleWebSerial::send(const char* name, JSONVar data) {
+    JSONVar event;
+    event[0] = name;
+    event[1] = data;
+    Serial.println(JSON.stringify(event));
 }
 
 
