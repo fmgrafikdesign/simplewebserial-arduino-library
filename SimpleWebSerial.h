@@ -29,7 +29,7 @@ public:
     SimpleWebSerial();
     void check(); // Makes the library check for serial data
     //void on(const char* name, void (*callback)()); // Event name, callback
-    void on(const char* name, void (*callback)(JSONVar)); // Event name, callback
+    void on(const char* name, void (*callback)()); // Event name, callback
     void onData(); // callback
     void send(JSONVar data); // Event name + data or just data
     void send(const char* name, JSONVar data); // Event name + data or just data
@@ -40,7 +40,7 @@ private:
     int _index = 0; // Keeps track on used events
 
     char eventNames[MaximumNumberOfEvents][MaximumEventNameLength]; // Array of event names
-    void (*callbacks[])(JSONVar); // Array of function pointers
+    void (*callbacks[])(); // Array of function pointers
     char receivedChars[SerialBufferSize];
     bool parseData = false;
     // char eventName[MaximumEventNameLength];

@@ -25,8 +25,11 @@ void SimpleWebSerial::check() {
     char endMarker = '\n';
     char receivedChar;
 
+
     // Read data until endMarker is received or buffer is full
     while (Serial.available() > 0 && parseData == false) {
+        // (*callbacks[0])();
+        // (*_callback)();
         receivedChar = Serial.read();
 
         if (receivedChar != endMarker) {
@@ -36,7 +39,7 @@ void SimpleWebSerial::check() {
                 bufferIndex = SerialBufferSize - 1;
             }
         }
-        // When we receive the endMarker, terminate the string and set parseData to true
+            // When we receive the endMarker, terminate the string and set parseData to true
         else {
             receivedChars[bufferIndex] = '\0'; // terminate the string
             parseData = true;
@@ -45,81 +48,86 @@ void SimpleWebSerial::check() {
     }
 
     if (parseData) {
-
-        // It is to be assumed that receivedChars will be stringified JSON once it's complete.
-        Serial.print("This just in ... ");
-        Serial.println(receivedChars);
-        JSONVar parsed = JSON.parse(receivedChars);
-
-        // JSON.typeof(jsonVar) can be used to get the type of the var
-        /*
-        if (JSON.typeof(parsed) == "undefined") {
-            Serial.println("Parsing input failed! Malformed data sent or buffer overflow.");
-            return;
-        }
-*/
-
-        Serial.println(JSON.stringify(parsed));
-        Serial.println(JSON.typeof(parsed));
         parseData = false;
+        /*
+            // It is to be assumed that receivedChars will be stringified JSON once it's complete.
+            parseData = false;
+            Serial.print("This just in ... ");
+            Serial.println(receivedChars);
+            JSONVar parsed = JSON.parse(receivedChars);
 
-        // Find out if it's an named event
-        bool namedEvent = false;
-        if (parsed.length() > 1 && JSON.typeof(parsed[0]) == "string") {
-            Serial.println(
-                    "Received array has more than 1 element and its first element is string. Assuming named event!");
-            for (int i = 0; i < ARRAYSIZE(eventNames); i++) {
-                if (eventNames[i][0] == '\0') continue;
+            // JSON.typeof(jsonVar) can be used to get the type of the var
 
-                //Serial.print("Comparing ");
-                //Serial.print((const char *) parsed[0]);
-                //Serial.print(" to ");
-                //Serial.println(eventNames[i]);
+            if (JSON.typeof(parsed) == "undefined") {
+                Serial.println("Parsing input failed! Malformed data sent or buffer overflow.");
+                return;
+            }
 
-                int compare_result = strcmp(eventNames[i], (const char *)parsed[0]);
-                //Serial.println(compare_result);
-                //Serial.print("first character in eventNames:");
-                //Serial.println(eventNames[_index][0]);
+            //Serial.println(JSON.stringify(parsed));
+            //Serial.println(JSON.typeof(parsed));
 
-                //Serial.print("first character in received event:");
-                //Serial.println(eventName[0]);
+            // Find out if it's an named event
+            bool namedEvent = false;
+            if (parsed.length() > 1 && JSON.typeof(parsed[0]) == "string") {
+                Serial.println(
+                        "Received array has more than 1 element and its first element is string. Assuming named event!");
+                for (int i = 0; i < ARRAYSIZE(eventNames); i++) {
+                    if (eventNames[i][0] == '\0') continue;
 
-                // Serial.println(compare_result);
-                if (compare_result == 0) {
-                    Serial.print("Found event named ");
-                    Serial.print(parsed[0]);
-                    Serial.println(" in registered eventNames");
-                    Serial.println(parsed[1]);
+                    //Serial.print("Comparing ");
+                    //Serial.print((const char *) parsed[0]);
+                    //Serial.print(" to ");
+                    //Serial.println(eventNames[i]);
 
-                    // (*callbacks[i])((JSONVar) parsed[1]);
+                    int compare_result = strcmp(eventNames[i], (const char *)parsed[0]);
+                    //Serial.println(compare_result);
+                    //Serial.print("first character in eventNames:");
+                    //Serial.println(eventNames[_index][0]);
 
-                    namedEvent = true;
-                    // break;
+                    //Serial.print("first character in received event:");
+                    //Serial.println(eventName[0]);
+
+                    // Serial.println(compare_result);
+                    if (compare_result == 0) {
+                        Serial.print("Found event named ");
+                        Serial.print(parsed[0]);
+                        Serial.println(" in registered eventNames");
+                        Serial.print("Trying to call callback with index ");
+                        Serial.println(i);
+                        //Serial.println((*callbacks[i]));
+
+                        // (*callbacks[i])((JSONVar) parsed[1]);
+                        // (*_callback)();
+
+                        //(*callbacks[i])();
+
+                        namedEvent = true;
+                        // break;
+                    }
                 }
+                if (!namedEvent) {
+                    Serial.print("Could not find an event named '");
+                    Serial.print(parsed[0]);
+                    Serial.println("' in the registered eventNames");
+                }
+
+            } else if (parsed.length() > 1 && JSON.typeof(parsed[0]) != "string"){
+                Serial.println(
+                        "Received array has more than 1 element but its first element is not a string. Malformed data?");
+            } else {
+                Serial.println("Received array has only 1 element. Handle pure data");
+                // TODO Handle pure data
             }
-            if (!namedEvent) {
-                Serial.print("Could not find an event named '");
-                Serial.print(parsed[0]);
-                Serial.println("' in the registered eventNames");
-            }
 
-        } else if (parsed.length() > 1 && JSON.typeof(parsed[0]) != "string"){
-            Serial.println(
-                    "Received array has more than 1 element but its first element is not a string. Malformed data?");
-        } else {
-            Serial.println("Received array has only 1 element. Handle pure data");
-            // TODO Handle pure data
-        }
+            // If it's a named event, find out its name
 
-        // If it's a named event, find out its name
-
-        // Loop through registered eventNames
-
+            // Loop through registered eventNames
+    */
     }
 
 }
 
-void SimpleWebSerial::on(const char *name, void (*callback)(JSONVar)) {
+void SimpleWebSerial::on(const char *name, void (*callback)()) {
     // TODO show warning if you're using more events than allowed. Check if you can do that w/ Arduino compiler
 
     strcpy(eventNames[_index], name);
@@ -129,7 +137,7 @@ void SimpleWebSerial::on(const char *name, void (*callback)(JSONVar)) {
     Serial.print(" has been defined as an event with index ");
     Serial.println(_index);
 
-    // callbacks[_index]();
+    callbacks[_index]();
     _index++;
 }
 
@@ -148,7 +156,7 @@ void SimpleWebSerial::send(JSONVar data) {
     Serial.println(JSON.stringify(data));
 }
 
-void SimpleWebSerial::send(const char* name, JSONVar data) {
+void SimpleWebSerial::send(const char *name, JSONVar data) {
     JSONVar event;
     event[0] = name;
     event[1] = data;
@@ -163,21 +171,5 @@ void SimpleWebSerial::setCallback(void (*callback)()) {
 void SimpleWebSerial::onData() {
     // look for the next valid integer in the incoming serial stream:
 
-    /*
-    int red = Serial.parseInt();
-    int green = Serial.parseInt();
-    int blue = Serial.parseInt();
-
-    if (Serial.read() == '\n') {
-
-        Serial.print("#");
-        Serial.print(red, DEC);
-        Serial.print(green, DEC);
-        Serial.println(blue, DEC);
-        // Serial.println(Serial.read());
-    }
-     */
-    Serial.println(Serial.readStringUntil('\n'));
-
-    (*_callback)();
+    //(*_callback)();
 }
