@@ -11,20 +11,12 @@
 #define ARRAYSIZE(x)  (sizeof(x) / sizeof(x[0]))
 
 SimpleWebSerial::SimpleWebSerial() {
-    //Serial.println("Library instance created!");
-/*
-    // Initialize events
-    for (int i = 0; i < MaximumNumberOfEvents; i++) {
-        eventNames[i] = "Hello";
-    }
-    */
 }
 
 void SimpleWebSerial::check() {
     static byte bufferIndex = 0;
     char endMarker = '\n';
     char receivedChar;
-
 
     // Read data until endMarker is received or buffer is full
     while (Serial.available() > 0 && parseData == false) {
@@ -50,8 +42,6 @@ void SimpleWebSerial::check() {
     if (parseData) {
         parseData = false;
         // It is to be assumed that receivedChars will be stringified JSON once it's complete.
-        //Serial.print("This just in ... ");
-
         JSONVar parsed = JSON.parse(receivedChars);
 
         // If I comment this out, JSON.typeof(parsed) is never undefined. Why?
@@ -68,6 +58,17 @@ void SimpleWebSerial::check() {
 
         // Find out if it's an named event
         bool namedEvent = false;
+        int isPureData = strcmp("_d", (const char *) parsed[0]);
+        int isPureEvent = strcmp("_e", (const char *) parsed[0]);
+        if(isPureData == 0) {
+            parsed[0] = "data";
+        }
+
+        if(isPureEvent == 0) {
+            parsed[0] = (const char*)parsed[1];
+            parsed[1] = nullptr;
+        }
+
         if (parsed.length() > 1 && JSON.typeof(parsed[0]) == "string") {
             // Serial.println("Received array has more than 1 element and its first element is string. Assuming named event!");
 
@@ -127,8 +128,7 @@ void SimpleWebSerial::check() {
             //Serial.println("Received array has more than 1 element but its first element is not a string. Malformed data?");
             this->warn("Received array has more than 1 element but its first element is not a string. Malformed data?");
         } else {
-            Serial.println("Received array has only 1 element. Handle pure data");
-            // TODO Handle pure data
+            Serial.println("Received array has only 1 element.");
         }
 
         // If it's a named event, find out its name
@@ -164,8 +164,12 @@ void SimpleWebSerial::listEvents() {
     // Serial.println(eventName);
 }
 
-void SimpleWebSerial::send(JSONVar data) {
-    Serial.println(JSON.stringify(data));
+void SimpleWebSerial::sendData(JSONVar data) {
+    this->send("_d", data);
+}
+
+void SimpleWebSerial::sendEvent(const char *name) {
+    Serial.println(JSON.stringify(name));
 }
 
 void SimpleWebSerial::send(const char *name, JSONVar data) {

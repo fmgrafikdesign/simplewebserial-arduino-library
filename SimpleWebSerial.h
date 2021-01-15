@@ -33,7 +33,8 @@ public:
     //void on(const char* name, void (*callback)()); // Event name, callback
     void on(const char* name, void (*callback)(JSONVar data)); // Event name, callback
     void onData(); // callback
-    void send(JSONVar data); // Event name + data or just data
+    void sendEvent(const char* name); // Only event name
+    void sendData(JSONVar data); // Only event name
     void send(const char* name, JSONVar data); // Event name + data or just data
     void setCallback(void (*callback)()); // Set callback for debug purposes
     void listEvents(); // DEBUG: List all registered events
