@@ -30,7 +30,6 @@ class SimpleWebSerial {
 public:
     SimpleWebSerial();
     void check(); // Makes the library check for serial data
-    //void on(const char* name, void (*callback)()); // Event name, callback
     void on(const char* name, void (*callback)(JSONVar data)); // Event name, callback
     void onData(); // callback
     void sendEvent(const char* name); // Only event name
