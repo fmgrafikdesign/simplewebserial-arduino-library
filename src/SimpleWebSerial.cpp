@@ -193,3 +193,11 @@ void SimpleWebSerial::onData() {
 void SimpleWebSerial::warn(const char *message) {
     this->send("_w", message);
 }
+
+void SimpleWebSerial::log(const char *message) {
+    this->send("_l", message);
+}
+
+void SimpleWebSerial::error(const char *message) {
+    this->send("_e", message);
+}
